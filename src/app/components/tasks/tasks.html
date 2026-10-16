@@ -9,55 +9,83 @@
         </div>
         <div class="task-input-block">
             <i class="bi bi-plus-lg"></i>
-            <input id="task-input" type="text" placeholder="Введите новую задачу..." />
-            <button class="add-button">Добавить</button>
+            <input id="task-input" name="taskTitle" [(ngModel)]="taskTitle" type="text" placeholder="Введите новую задачу..." />
+            <button class="add-button" type="submit" (click)="addTask(taskTitle)">Добавить</button>
         </div>
         <div class="task-wrapper">
             <div class="task-sort-by">
                 <div class="sort-by">
-                    <span class="active">Все</span>
-                    <span>Активные</span>
-                    <span>Выполненные</span>
+                    <button class="sort-button" [class.active]="currentFilter === 'all'" (click)="filterTasks('all')">Все</button>
+                    <button class="sort-button" [class.active]="currentFilter === 'active'" (click)="filterTasks('active')">Активные</button>
+                    <button class="sort-button" [class.active]="currentFilter === 'completed'" (click)="filterTasks('completed')">Выполненные</button>
                 </div>
                 <div class="tasks-amount">
-                    <p class="span">Всего задач: <span class="span">0</span></p>
-                </div>
-            </div>
-            <div class="tasks">
-                <input class="tasks-checkbox" type="checkbox">
-                <div class="task-description">
-                    <p>Description for Task 1</p>
-                    <span class="span"><i class="bi bi-calendar-check"></i>Добавлено: 2023-10-01</span>
-                </div>
-                <div class="task-actions">
-                    <button class="edit-button btn"><i class="bi bi-pencil"></i></button>
-                    <button class="delete-button btn"><i class="bi bi-trash"></i></button>
+                    <p class="span">Всего задач: <span class="span">{{ allTasks.length }}</span></p>
                 </div>
             </div>
             
-            <div class="tasks">
-                <input class="tasks-checkbox" type="checkbox">
-                <div class="task-description">
-                    <p>Description for Task 1</p>
-                    <span class="span"><i class="bi bi-calendar-check"></i>Добавлено: 2023-10-01</span>
+            @for (item of filteredTasks; track item.id) {
+                <div class="tasks">
+                    <input class="tasks-checkbox" type="checkbox" [checked]="item.completed" (change)="toggleTask(item.id)" />
+                    <div class="task-description">
+                        <p>{{ item.description }}</p>
+                        <span class="span"><i class="bi bi-calendar-check"></i>Добавлено: {{ item.date }}</span>
+                    </div>
+                    <div class="task-actions">
+                        <button class="edit-button btn" (click)="openEditModal(item)"><i class="bi bi-pencil"></i></button>
+                        <button class="delete-button btn" (click)="openDeleteModal(item.id)"><i class="bi bi-trash"></i></button>
+                    </div>
                 </div>
-                <div class="task-actions">
-                    <button class="edit-button btn"><i class="bi bi-pencil"></i></button>
-                    <button class="delete-button btn"><i class="bi bi-trash"></i></button>
+            } @empty {
+                <div class="no-tasks-container">
+                    <div class="no-task">
+                        <span class="span"><i class="bi bi-exclamation-circle"></i></span>
+                        <p>Задач не найдено</p>
+                    </div>
                 </div>
-            </div>
+            }
 
-            <div class="tasks">
-                <input class="tasks-checkbox" type="checkbox">
-                <div class="task-description">
-                    <p>Description for Task 1</p>
-                    <span class="span"><i class="bi bi-calendar-check"></i>Добавлено: 2023-10-01</span>
+            
+            <!-- edit and delete modals -->
+
+            @if (editingTaskId !== null) {
+                <div class="modal-backdrop">
+                    <div class="modal-card">
+                        <div class="modal-header">
+                            <h3>Редактировать задачу</h3>
+                            <button class="close-btn" (click)="closeEditModal()"><i class="bi bi-x-lg"></i></button>
+                        </div>
+                        
+                        <input type="text" 
+                            [(ngModel)]="editText" 
+                            placeholder="Введите новое описание..." 
+                            class="modal-input">
+
+                        <div class="modal-buttons">
+                            <button class="btn-cancel modal-btn" (click)="closeEditModal()">Отмена</button>
+                            <button class="btn-save modal-btn" (click)="saveTaskEdit()">Сохранить</button>
+                        </div>
+                    </div>
                 </div>
-                <div class="task-actions">
-                    <button class="edit-button btn"><i class="bi bi-pencil"></i></button>
-                    <button class="delete-button btn"><i class="bi bi-trash"></i></button>
+            }
+
+
+
+            @if (deletingTaskId !== null) {
+                <div class="modal-backdrop">
+                    <div class="modal-card delete-card">
+                        <div class="modal-header">
+                            <h3>Удалить задачу</h3>
+                            <button class="close-btn" (click)="closeDeleteModal()"><i class="bi bi-x-lg"></i></button>
+                        </div>
+                        <p>Вы действительно хотите удалить эту задачу?</p>
+                        <div class="modal-buttons">
+                            <button class="btn-cancel modal-btn" (click)="closeDeleteModal()">Отмена</button>
+                            <button class="btn-save modal-btn" (click)="confirmDelete()">Удалить</button>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            }
         </div>
     </div>
 </div>

@@ -1,6 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Tasks } from './components/tasks/tasks';
+import { taskModel } from './models/task-model';
 
 @Component({
   selector: 'app-root',
